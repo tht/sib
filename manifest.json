@@ -1,0 +1,12 @@
+{
+    "domain": "vancan",
+    "name": "VanCAN",
+    "version": "0.1.0",
+    "documentation": "https://www.example.com",
+    "requirements": [],
+    "codeowners": ["@your_github_username"],
+    "config_flow": true,
+    "iot_class": "local_polling",
+    "integration_type": "hub",
+    "supported_platforms": ["binary_sensor"]
+  }

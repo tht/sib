@@ -1,0 +1,31 @@
+{
+    "title": "VanCAN",
+    "config": {
+      "step": {
+        "user": {
+          "title": "Set up VanCAN",
+          "description": "Configure your VanCAN integration.",
+          "data": {
+            "interface": "CAN Interface",
+            "baud_rate": "Baud Rate"
+          }
+        }
+      },
+      "error": {
+        "cannot_connect": "Unable to connect to the device."
+      }
+    },
+    "options": {
+      "step": {
+        "init": {
+          "title": "VanCAN Options",
+          "description": "Adjust settings for your VanCAN integration.",
+          "data": {
+            "add_sensor": "Add new Binary Sensor",
+            "name": "Name for the new Binary Sensor",
+            "address": "Bus Address for Binary Sensor state"
+          }
+        }
+      }
+    }
+  }
