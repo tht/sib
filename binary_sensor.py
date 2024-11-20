@@ -8,10 +8,10 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     _LOGGER.warn("binary_sensor.py async_setup_entry")
     """Set up SIB binary sensors from a config entry."""
-    sensors = config_entry.options.get("sensors", [])
+    sensors = config_entry.options.get("binary_sensors", [])
     
     # Track existing entities to prevent duplicates
-    #existing_entities = hass.data[DOMAIN].get(config_entry.entry_id, {}).get("sensors", [])
+    #existing_entities = hass.data[DOMAIN].get(config_entry.entry_id, {}).get("binary_sensors", [])
     existing_entities = []
     _LOGGER.warn("Existing entities: %s", existing_entities)
     new_entities = []
@@ -22,7 +22,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             new_entities.append(SIBBinarySensor(config_entry, sensor["name"], sensor["address"]))
             existing_entities.append(sensor)
 
-    hass.data[DOMAIN][config_entry.entry_id]["sensors"] = existing_entities
+    hass.data[DOMAIN][config_entry.entry_id]["binary_sensors"] = existing_entities
 
     # Add only the new entities
     async_add_entities(new_entities, update_before_add=True)
