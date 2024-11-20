@@ -18,10 +18,17 @@
     "options": {
       "step": {
         "init": {
-          "title": "SIB Options",
-          "description": "Adjust settings for your SIB integration.",
+          "title": "SIB Configuration",
+          "description": "Add/edit/remove SIB entities.",
           "data": {
-            "add_sensor": "Add new Binary Sensor",
+            "add_binary_sensor": "Add a new Binary Sensor",
+            "add_sensor": "Add a new (Numeric) Sensor"
+          }
+        },
+        "add_binary_sensor": {
+          "title": "Add Binary Sensor",
+          "description": "Add a binary sensor to your SIB integration.",
+          "data": {
             "name": "Name for the new Binary Sensor",
             "address": "Bus Address for Binary Sensor state"
           }
