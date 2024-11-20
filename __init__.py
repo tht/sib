@@ -7,7 +7,7 @@ _LOGGER = logging.getLogger(__name__)
 from .const import DOMAIN
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up VanCAN from a config entry."""
+    """Set up SIB from a config entry."""
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {
         "sensors": entry.options.get("sensors", []),  # Load sensors from options

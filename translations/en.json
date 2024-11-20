@@ -1,10 +1,10 @@
 {
-    "title": "VanCAN",
+    "title": "Smart Integration Bus (SIB)",
     "config": {
       "step": {
         "user": {
-          "title": "Set up VanCAN",
-          "description": "Configure your VanCAN integration.",
+          "title": "Set up Smart Integration Bus",
+          "description": "Configure your SIB integration.",
           "data": {
             "interface": "CAN Interface",
             "baud_rate": "Baud Rate"
@@ -12,14 +12,14 @@
         }
       },
       "error": {
-        "cannot_connect": "Unable to connect to the device."
+        "cannot_connect": "XXnotusedXX - Unable to connect to the device."
       }
     },
     "options": {
       "step": {
         "init": {
-          "title": "VanCAN Options",
-          "description": "Adjust settings for your VanCAN integration.",
+          "title": "SIB Options",
+          "description": "Adjust settings for your SIB integration.",
           "data": {
             "add_sensor": "Add new Binary Sensor",
             "name": "Name for the new Binary Sensor",

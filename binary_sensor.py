@@ -1,4 +1,4 @@
-"""Binary sensor platform for VanCAN."""
+"""Binary sensor platform for SIB."""
 from homeassistant.helpers.entity import Entity
 from .const import DOMAIN
 
@@ -7,7 +7,7 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     _LOGGER.warn("binary_sensor.py async_setup_entry")
-    """Set up VanCAN binary sensors from a config entry."""
+    """Set up SIB binary sensors from a config entry."""
     sensors = config_entry.options.get("sensors", [])
     
     # Track existing entities to prevent duplicates
@@ -19,7 +19,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     for sensor in sensors:
         if sensor not in existing_entities:
             _LOGGER.warn("New entity: %s", sensor)
-            new_entities.append(VanCANBinarySensor(config_entry, sensor["name"], sensor["address"]))
+            new_entities.append(SIBBinarySensor(config_entry, sensor["name"], sensor["address"]))
             existing_entities.append(sensor)
 
     hass.data[DOMAIN][config_entry.entry_id]["sensors"] = existing_entities
@@ -28,12 +28,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities(new_entities, update_before_add=True)
 
 
-class VanCANBinarySensor(Entity):
-    """Representation of a VanCAN binary sensor."""
+class SIBBinarySensor(Entity):
+    """Representation of a SIB binary sensor."""
 
     def __init__(self, config_entry, name: str, address: str):
         """Initialize the binary sensor."""
-        _LOGGER.warn("binary_sensor.py VanCANBinarySensor.__init__")
+        _LOGGER.warn("binary_sensor.py SIBBinarySensor.__init__")
         self._name = name
         self._address = address
         self._config_entry = config_entry
