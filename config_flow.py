@@ -41,6 +41,7 @@ class SIBConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class SIBOptionsFlow(config_entries.OptionsFlow):
     """Handle options flow for SIB."""
 
+    # Local cache for configuration to write it back at the very end
     data: Optional[Dict[str, Any]]
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
