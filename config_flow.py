@@ -1,11 +1,10 @@
 from copy import deepcopy
+from typing import Any, Dict, Optional
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 import voluptuous as vol
 from .const import DOMAIN
-
-from typing import Optional, Dict, Any
 
 import logging
 _LOGGER = logging.getLogger(__name__)
@@ -42,10 +41,13 @@ class SIBConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class SIBOptionsFlow(config_entries.OptionsFlow):
     """Handle options flow for SIB."""
 
+    data: Optional[Dict[str, Any]]
+
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Make a deepcopy of the existing options to work on"""
-        self.config_entry = config_entry
-        self.data = deepcopy(self.config_entry.options.get("binary_sensors", []))
+        self.data = deepcopy(config_entry.options.copy())
+        _LOGGER.warn("config_flow.py/__init__: loaded configuration %s", self.data)
+        #TODO: Make sure we have all the main keys (like `binary_sensors` set)
 
     async def async_step_init(self, user_input=None):
         """Initial step of options flow."""
@@ -55,7 +57,7 @@ class SIBOptionsFlow(config_entries.OptionsFlow):
                 return await self.async_step_add_binary_sensor()
 
             # Exit the options flow and store working copy of data to Home-Assistant
-            return self.async_create_entry(title="", data={"binary_sensors": self.data})
+            return self.async_create_entry(title="", data=self.data)
 
         # Show form when no user_input is supplied
         return self.async_show_form(
@@ -70,7 +72,7 @@ class SIBOptionsFlow(config_entries.OptionsFlow):
         """Step to add a new binary sensor."""
         if user_input is not None:
             # Add the new sensor
-            self.data.append(
+            self.data["binary_sensors"].append(
                 {
                     "name": user_input["name"],
                     "address": user_input["address"],
