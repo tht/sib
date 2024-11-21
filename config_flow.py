@@ -11,17 +11,19 @@ import logging
 _LOGGER = logging.getLogger(__name__)
 
 class SIBConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for SIB."""
+    """Handle a config flow for configuring an SIB instance."""
 
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
         if user_input is not None:
+            # Try to configure an unique id, make sure it's actually unique (one instance per interface)
             await self.async_set_unique_id(f"{DOMAIN}_{user_input['interface']}")
             self._abort_if_unique_id_configured()
             return self.async_create_entry(title=f"SIB on {user_input['interface']} ({user_input['baud_rate']}bps)", data=user_input)
 
+        # Show form when no user_input is supplied
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
@@ -41,23 +43,21 @@ class SIBOptionsFlow(config_entries.OptionsFlow):
     """Handle options flow for SIB."""
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        """Make a deepcopy of the existing options to work on"""
         self.config_entry = config_entry
         self.data = deepcopy(self.config_entry.options.get("binary_sensors", []))
 
     async def async_step_init(self, user_input=None):
         """Initial step of options flow."""
-        _LOGGER.warn("async_step_init: List of sensors from Entry (after adding): %s", self.config_entry.options.get("binary_sensors", []))
-
         if user_input is not None:
+            # Jump to sub-flow for choosen action
             if user_input.get("add_binary_sensor"):
-                # Transition to the step for adding a new binary_sensor
                 return await self.async_step_add_binary_sensor()
 
-            _LOGGER.warn("New list of sensors from Entry (in step init): %s", self.config_entry.options.get("binary_sensors", []))
-            # Exit the options flow without changing data as this was done in the sub-steps
+            # Exit the options flow and store working copy of data to Home-Assistant
             return self.async_create_entry(title="", data={"binary_sensors": self.data})
-            #return await self.async_step_init()
 
+        # Show form when no user_input is supplied
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
@@ -70,24 +70,18 @@ class SIBOptionsFlow(config_entries.OptionsFlow):
         """Step to add a new binary sensor."""
         if user_input is not None:
             # Add the new sensor
-            #sensors = self.config_entry.options.get("binary_sensors", [])
             self.data.append(
                 {
                     "name": user_input["name"],
                     "address": user_input["address"],
                     "device_class": user_input['device_class']
                 })
-            #self.data['binary_sensors'] = sensors
-            _LOGGER.warn("New list of sensors: %s", self.data)
-            
-            _LOGGER.warn("async_step_add_binary_sensor: New list of sensors from Entry (after adding): %s", self.config_entry.options.get("binary_sensors", []))
 
             # Return to the main options menu
-            #return self.async_create_entry(title="", data={ "binary_sensors": sensors })
             return await self.async_step_init()
 
+        # Show form when no user_input is supplied
         device_class_options = [cls.value for cls in BinarySensorDeviceClass]
-
         return self.async_show_form(
             step_id="add_binary_sensor",
             data_schema=vol.Schema({
