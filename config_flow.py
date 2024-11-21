@@ -1,3 +1,4 @@
+from copy import deepcopy
 from homeassistant import config_entries
 from homeassistant.core import callback
 import voluptuous as vol
@@ -32,11 +33,15 @@ class SIBConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry):
         """Return the options flow."""
-        return SIBOptionsFlow()
+        return SIBOptionsFlow(config_entry)
 
 
 class SIBOptionsFlow(config_entries.OptionsFlow):
     """Handle options flow for SIB."""
+
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        self.config_entry = config_entry
+        self.data = deepcopy(self.config_entry.options.get("binary_sensors", []))
 
     async def async_step_init(self, user_input=None):
         """Initial step of options flow."""
@@ -49,8 +54,8 @@ class SIBOptionsFlow(config_entries.OptionsFlow):
 
             _LOGGER.warn("New list of sensors from Entry (in step init): %s", self.config_entry.options.get("binary_sensors", []))
             # Exit the options flow without changing data as this was done in the sub-steps
-            #return self.async_create_entry(title="", data=self.data)
-            return await self.async_step_init()
+            return self.async_create_entry(title="", data={"binary_sensors": self.data})
+            #return await self.async_step_init()
 
         return self.async_show_form(
             step_id="init",
@@ -64,25 +69,25 @@ class SIBOptionsFlow(config_entries.OptionsFlow):
         """Step to add a new binary sensor."""
         if user_input is not None:
             # Add the new sensor
-            sensors = self.config_entry.options.get("binary_sensors", [])
-            sensors.append(
+            #sensors = self.config_entry.options.get("binary_sensors", [])
+            self.data.append(
                 {
                     "name": user_input["name"],
                     "address": user_input["address"]
                 })
             #self.data['binary_sensors'] = sensors
-            _LOGGER.warn("New list of sensors: %s", sensors)
+            _LOGGER.warn("New list of sensors: %s", self.data)
             
             # Update the config entry with the new sensors list
             # The copy seems to be needed, I was only able to have a single
             # entity without it.
             #current_options = self.config_entry.options.copy()
             #current_options["binary_sensors"] = sensors
-            self.hass.config_entries.async_update_entry(
-                self.config_entry, options={
-                    "binary_sensors": sensors
-                },
-            )
+            #self.hass.config_entries.async_update_entry(
+            #    self.config_entry, options={
+            #        "binary_sensors": sensors
+            #    },
+            #)
 
             # Trigger a reload of the integration to apply changes
             #await self.hass.config_entries.async_reload(self.config_entry.entry_id)
