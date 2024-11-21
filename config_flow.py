@@ -1,6 +1,7 @@
 from copy import deepcopy
 from homeassistant import config_entries
 from homeassistant.core import callback
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 import voluptuous as vol
 from .const import DOMAIN
 
@@ -73,35 +74,25 @@ class SIBOptionsFlow(config_entries.OptionsFlow):
             self.data.append(
                 {
                     "name": user_input["name"],
-                    "address": user_input["address"]
+                    "address": user_input["address"],
+                    "device_class": user_input['device_class']
                 })
             #self.data['binary_sensors'] = sensors
             _LOGGER.warn("New list of sensors: %s", self.data)
             
-            # Update the config entry with the new sensors list
-            # The copy seems to be needed, I was only able to have a single
-            # entity without it.
-            #current_options = self.config_entry.options.copy()
-            #current_options["binary_sensors"] = sensors
-            #self.hass.config_entries.async_update_entry(
-            #    self.config_entry, options={
-            #        "binary_sensors": sensors
-            #    },
-            #)
-
-            # Trigger a reload of the integration to apply changes
-            #await self.hass.config_entries.async_reload(self.config_entry.entry_id)
-
             _LOGGER.warn("async_step_add_binary_sensor: New list of sensors from Entry (after adding): %s", self.config_entry.options.get("binary_sensors", []))
 
             # Return to the main options menu
             #return self.async_create_entry(title="", data={ "binary_sensors": sensors })
             return await self.async_step_init()
 
+        device_class_options = [cls.value for cls in BinarySensorDeviceClass]
+
         return self.async_show_form(
             step_id="add_binary_sensor",
             data_schema=vol.Schema({
                 vol.Required("name"): str,
                 vol.Required("address"): int,
+                vol.Required("device_class", default=self.config_entry.options.get("device_class", None)): vol.In(device_class_options),
             }),
         )

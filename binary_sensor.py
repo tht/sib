@@ -1,5 +1,5 @@
 """Binary sensor platform for SIB."""
-from homeassistant.helpers.entity import Entity
+from homeassistant.components.binary_sensor import BinarySensorEntity
 from .const import DOMAIN
 
 import logging
@@ -19,7 +19,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     for sensor in sensors:
         if sensor not in existing_entities:
             _LOGGER.warn("New entity: %s", sensor)
-            new_entities.append(SIBBinarySensor(config_entry, sensor["name"], sensor["address"]))
+            new_entities.append(SIBBinarySensor(config_entry, sensor["name"], sensor["address"], sensor["device_class"]))
             existing_entities.append(sensor)
 
     hass.data[DOMAIN][config_entry.entry_id]["binary_sensors"] = existing_entities
@@ -28,14 +28,15 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities(new_entities, update_before_add=True)
 
 
-class SIBBinarySensor(Entity):
+class SIBBinarySensor(BinarySensorEntity):
     """Representation of a SIB binary sensor."""
 
-    def __init__(self, config_entry, name: str, address: str):
+    def __init__(self, config_entry, name: str, address: str, device_class: str):
         """Initialize the binary sensor."""
         _LOGGER.warn("binary_sensor.py SIBBinarySensor.__init__")
         self._name = name
         self._address = address
+        self._device_class = device_class
         self._config_entry = config_entry
         self._attr_unique_id = f"{config_entry.entry_id}_{address}"
         self._attr_config_entry_id = config_entry.entry_id
@@ -45,6 +46,11 @@ class SIBBinarySensor(Entity):
     def name(self):
         """Return the name of the sensor."""
         return self._name
+
+    @property
+    def device_class(self):
+        """Return the device class of the sensor."""
+        return self._device_class
 
     @property
     def is_on(self):
