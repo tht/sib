@@ -12,9 +12,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     new_entities = []
     for sensor in config_entry.options.get("binary_sensors", []):
         new_entities.append(SIBBinarySensor(config_entry, sensor["name"], sensor["address"], sensor["device_class"]))
-        existing_entities.append(sensor)
 
-    hass.data[DOMAIN][config_entry.entry_id]["binary_sensors"] = existing_entities
+    hass.data[DOMAIN][config_entry.entry_id]["binary_sensors"] = new_entities
 
     # Add the new entities
     async_add_entities(new_entities, update_before_add=True)
@@ -22,6 +21,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 class SIBBinarySensor(BinarySensorEntity):
     """Representation of a SIB binary sensor."""
+    _attr_has_entity_name = True
 
     def __init__(self, config_entry, name: str, address: str, device_class: str):
         """Initialize the binary sensor."""
@@ -48,6 +48,13 @@ class SIBBinarySensor(BinarySensorEntity):
     def is_on(self):
         """Return the state of the sensor."""
         return self._is_on
+
+    @property
+    def extra_state_attributes(self):
+        """Return the state attributes."""
+        return {
+            "sib_state_address": self._address
+        }
 
     async def async_update(self):
         """Update the state of the sensor."""
